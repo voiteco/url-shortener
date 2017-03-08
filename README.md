@@ -1,12 +1,19 @@
 ### Small URL shortener in Go
+
 This service encodes URL and store them in Redis.
+
 It has 3 features: create, get, and redirect.
 
 ### Why?
+
 But this project exists to demonstrate:
+
 * How easy it is to get up and running in Go.
+
 * How comprehensive Go standard library is.
+
 * And of course, performance:
+
     ```
     # Command  : ab -n 100000 -c 200 -k http://localhost:8080/create?url=https%3A%2F%2Fwww.google.com%2F
     # Processor: 2.30 GHz Intel Core i7-4712MQ
