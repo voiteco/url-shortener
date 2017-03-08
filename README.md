@@ -1,6 +1,3 @@
-[![GoDoc](https://godoc.org/github.com/didip/shawty?status.svg)](http://godoc.org/github.com/voiteco/url-shortener)
-[![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/voiteco/url-shortener/master/LICENSE)
-
 ### Small URL shortener in Go
 This service encodes URL and store them in Redis.
 It has 3 features: create, get, and redirect.
