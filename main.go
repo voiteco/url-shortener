@@ -14,15 +14,15 @@ import (
 )
 
 var (
-	port          *uint
-	redisAddress  *string
+	port   *uint
+	redis  *string
 )
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	port = flag.Uint("port", 8080, "Bind port")
-	redisAddress = flag.String("redisAddress", "127.0.0.1:6379", "Redis address")
+	redis = flag.String("redis", "127.0.0.1:6379", "Redis address")
 }
 
 func main() {
@@ -30,11 +30,13 @@ func main() {
 
 	flag.Parse()
 
-	s := storage.InitStorage(*redisAddress)
+	s := storage.InitStorage(*redis)
+	c := handler.Configuration{}
+	c.ParseConfig()
 
 	router := fasthttprouter.New()
-	router.GET("/create", handler.CreateUrlHandler(handler.Handler, s))
-	router.GET("/get/:uid", handler.GetUrlHandler(handler.Handler, s))
+	router.GET("/create", handler.CreateUrlHandler(handler.Handler, s, c))
+	router.GET("/get/:uid", handler.GetUrlHandler(handler.Handler, s, c))
 	router.GET("/u/:uid", handler.RedirectHandler(handler.Handler, s))
 
 	log.Fatal(fasthttp.ListenAndServe(fmt.Sprintf(":%d", *port), router.Handler))

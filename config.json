@@ -1,0 +1,5 @@
+{
+  "authentication": true,
+  "authenticationParameter": "X-URLShortener-Token",
+  "authenticationToken": "x"
+}

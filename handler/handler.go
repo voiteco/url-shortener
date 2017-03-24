@@ -11,23 +11,31 @@ import (
 func Handler(ctx *fasthttp.RequestCtx) {}
 
 
-func CreateUrlHandler(h fasthttp.RequestHandler, s *storage.Storage) fasthttp.RequestHandler {
+func CreateUrlHandler(h fasthttp.RequestHandler, s *storage.Storage, c Configuration) fasthttp.RequestHandler {
 	return fasthttp.RequestHandler(func(ctx *fasthttp.RequestCtx) {
-		query := ctx.URI().QueryArgs()
-		urlAddress := string(query.Peek("url"))
-		url := storage.CreateUrl(s, urlAddress)
-		fmt.Fprintf(ctx, "%s", ConvertUrlToJson(url))
-		ctx.SetContentType("application/json")
+		if !CheckAuthentication(c, ctx) {
+			ctx.SetStatusCode(403)
+		} else {
+			query := ctx.URI().QueryArgs()
+			urlAddress := string(query.Peek("url"))
+			url := storage.CreateUrl(s, urlAddress)
+			fmt.Fprintf(ctx, "%s", ConvertUrlToJson(url))
+			ctx.SetContentType("application/json")
+		}
 		h(ctx)
 	})
 }
 
-func GetUrlHandler(h fasthttp.RequestHandler, s *storage.Storage) fasthttp.RequestHandler {
+func GetUrlHandler(h fasthttp.RequestHandler, s *storage.Storage, c Configuration) fasthttp.RequestHandler {
 	return fasthttp.RequestHandler(func(ctx *fasthttp.RequestCtx) {
-		uid := ctx.UserValue("uid").(string)
-		url := storage.GetUrl(s, uid)
-		fmt.Fprintf(ctx, "%s", ConvertUrlToJson(*url))
-		ctx.SetContentType("application/json")
+		if !CheckAuthentication(c, ctx) {
+			ctx.SetStatusCode(403)
+		} else {
+			uid := ctx.UserValue("uid").(string)
+			url := storage.GetUrl(s, uid)
+			fmt.Fprintf(ctx, "%s", ConvertUrlToJson(*url))
+			ctx.SetContentType("application/json")
+		}
 		h(ctx)
 	})
 }
@@ -40,6 +48,14 @@ func RedirectHandler(h fasthttp.RequestHandler, s *storage.Storage) fasthttp.Req
 		ctx.Redirect(url.Url, 302)
 		h(ctx)
 	})
+}
+
+func CheckAuthentication(c Configuration, ctx *fasthttp.RequestCtx) bool {
+	if c.Authentication {
+		token := ctx.Request.Header.Peek(c.AuthenticationParameter)
+		return string(token) == c.AuthenticationToken
+	}
+	return true
 }
 
 func ConvertUrlToJson(url storage.Url) string {
