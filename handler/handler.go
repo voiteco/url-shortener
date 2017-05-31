@@ -18,8 +18,14 @@ func CreateUrlHandler(h fasthttp.RequestHandler, s *storage.Storage, c Configura
 			ctx.SetStatusCode(401)
 			fmt.Fprintf(ctx, "Unauthorized")
 		} else {
-			query := ctx.URI().QueryArgs()
-			urlAddress := string(query.Peek("url"))
+			var urlAddress string
+			if ctx.Request.Header.IsPost() {
+				params := ctx.Request.PostArgs()
+				urlAddress = string(params.Peek("url"))
+			} else {
+				query := ctx.URI().QueryArgs()
+				urlAddress = string(query.Peek("url"))
+			}
 			_, err := url.ParseRequestURI(urlAddress)
 			if err != nil {
 				ctx.SetStatusCode(500)

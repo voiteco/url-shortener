@@ -36,6 +36,7 @@ func main() {
 
 	router := fasthttprouter.New()
 	router.GET("/create", handler.CreateUrlHandler(handler.Handler, s, c))
+	router.POST("/create", handler.CreateUrlHandler(handler.Handler, s, c))
 	router.GET("/get/:uid", handler.GetUrlHandler(handler.Handler, s, c))
 	router.GET("/u/:uid", handler.RedirectHandler(handler.Handler, s))
 
